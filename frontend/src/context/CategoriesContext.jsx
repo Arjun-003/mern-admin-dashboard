@@ -1,7 +1,11 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import api from "../api/axios.js" // <-- adjust path to your axios file
 
 export const CatContext = createContext();
+
+export const useCat = () =>{
+    return useContext(CatContext);
+};
 
 export const CatProvider = ({ children }) => {
     const [categories, setCategories] = useState([]);

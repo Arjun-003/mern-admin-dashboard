@@ -24,43 +24,31 @@ import InterestsAddEdit from "./pages/Interests/InterestsAddEdit";
 import CategoryList from "./pages/Category/CategoryList";
 import CategoryView from "./pages/Category/CategoryView";
 import CategoryAddEdit from "./pages/Category/CategoryAddEdit";
-import ProviderList from "./pages/Provider/ProviderList";
-import ProviderView from "./pages/Provider/ProviderView";
+import SellerList from "./pages/Seller/SellerList";
+import SellerView from "./pages/Seller/SellerView";
 import SubscriptionList from "./pages/Subscription/SubscriptionList";
 import SubscriptionAddEdit from "./pages/Subscription/SubscriptionAddEdit";
 import SubscriptionView from "./pages/Subscription/SubscriptionView";
-
 import PushNotificationAdd from "./pages/PushNotification/PushNotificationAdd";
 import UserReportsList from "./pages/UserReports/UserReportsList";
 import UserReportsView from "./pages/UserReports/UserReportsView";
+import ProductDetail from "./pages/Products/ProductsDetail";
+import ProductsView from "./pages/Products/ProductView";
 
-import { useState, useEffect } from "react";
+import ProtectedRoute from "./ProtectedRoutes";
+
+import { useState } from "react";
 
 function App() {
-  // const isAuthenticated = false;
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem("token")
-  );
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsAuthenticated(!!localStorage.getItem("token"));
-    };
-
-    // Listen for token changes
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
 
   return (
     <>
       <Routes>
-        
+        <Route path="/login" element={<Login />} />
+        <Route element={<ProtectedRoute />}>
+
           <Route
             element={
               <LayoutWrapper
@@ -75,10 +63,16 @@ function App() {
             <Route path="/users_listing" element={<UserList />} />
             <Route path="/users_view/:userId" element={<UserView />} />
 
-            <Route path="/providers_listing" element={<ProviderList />} />
+            <Route path="/Seller_listing" element={<SellerList />} />
             <Route
-              path="/providers_view/:providerId"
-              element={<ProviderView />}
+              path="/sellers_view/:sellerId"
+              element={<SellerView />}
+            />
+
+            <Route path="/products_listing" element={<ProductDetail />} />
+            <Route
+              path="/product_view/:productId"
+              element={<ProductsView />}
             />
 
             <Route path="/interests" element={<InterestsList />} />
@@ -92,7 +86,7 @@ function App() {
               element={<InterestsAddEdit />}
             />
 
-           
+
 
             <Route path="/userReports_listing" element={<UserReportsList />} />
             <Route
@@ -100,7 +94,7 @@ function App() {
               element={<UserReportsView />}
             />
 
-           
+
 
             <Route
               path="/push-notifications"
@@ -145,12 +139,8 @@ function App() {
             {/* Redirect all unmatched routes to dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Route>
-       
-          <>
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Navigate to="/login" />} />
-          </>
-       
+        </Route>
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
 
       <ToastContainer position="top-right" autoClose={1000} />

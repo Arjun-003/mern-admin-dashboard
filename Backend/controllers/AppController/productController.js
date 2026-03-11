@@ -1,10 +1,10 @@
 import { Op } from "sequelize";
-import Product from "../models/product.js";
-import ProductImage from "../models/productImage.js"
-import users from "../models/users.js";
+import Product from "../../models/product.js";
+import ProductImage from "../../models/productImage.js"
+import users from "../../models/users.js";
 import fs from 'fs'
 import path from 'path'
-import Like from "../models/likeProduct.js";
+import Like from "../../models/likeProduct.js";
 
 
 const productData = {
@@ -104,12 +104,11 @@ const productData = {
     },
     // 📌 DELETE A PRODUCT AND ITS IMAGES
     deleteProduct: async (req, res) => {
-
+        
         try {
 
             const { id } = req.params;
             const userId = req.user.id;
-
             // ⭐ First check product exists + ownership
             const product = await Product.findByPk(id);
 
@@ -140,7 +139,7 @@ const productData = {
                 }
             }
             // ⭐ Delete DB records
-            await Likes.destroy({
+            await Like.destroy({
                 where: { productId: id }
             });
             await ProductImage.destroy({ where: { productId: id } });
@@ -225,10 +224,8 @@ const productData = {
 
     getSingleProduct: async (req, res) => {
         try {
-            const { id } = req.params;
-            const userId = req.user?.id; // 
-            console.log(id,'productId');
-            console.log(userId,'User Id from token');
+            const { id } = req.params; 
+            
             const product = await Product.findByPk(id, {
                 include: [  
                     {

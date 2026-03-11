@@ -1,16 +1,16 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext.jsx";
 import { RiMessageLine } from "react-icons/ri";
-import { CatContext } from "../context/CategoriesContext.jsx";
+import { useCat } from "../context/CategoriesContext.jsx";
 import socket from "../api/SocketIo.js";
+import { useAuth } from "../context/AuthProvider.jsx";
 
 const Header = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const { user, logout } = useContext(AuthContext);
-    const { categories = [], subCategories = [] } = useContext(CatContext);
+    const { user, logout } = useAuth();
+    const { categories = [], subCategories = [] } = useCat();
     const [imagepreview, setImagePreview] = useState(null);
     const [unreadCount, setUnreadCount] = useState(0);
     const [imageError, setImageError] = useState(false);

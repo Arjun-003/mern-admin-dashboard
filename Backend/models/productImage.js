@@ -25,5 +25,5 @@ const ProductImage = sequelize.define("ProductImage", {
         onDelete: "CASCADE"
     }
 });
-// sequelize.sync({force:true})
+// ProductImage.sync({force:true})
 export default ProductImage

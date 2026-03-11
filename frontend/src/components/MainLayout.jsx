@@ -5,9 +5,7 @@ const MainLayout = ({ onSearch }) => {
   return (
     <>
       <Header/>
-     
         <Outlet />
-      
     </>
   );
 };

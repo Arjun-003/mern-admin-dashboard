@@ -1,14 +1,14 @@
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
 import api from "../api/axios.js";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider.jsx";
 
 const PostItemDetail = () => {
     const navigate = useNavigate()
     const [images, setImages] = useState([]); // Preview URLs
     const [imageFiles, setImageFiles] = useState([]); // Original Files (for upload)
 
-    const { user, token } = useContext(AuthContext);
+    const { user, token } = useAuth();
 
     const [product, setProduct] = useState({
         name: "",

@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useApi from "../api/hooks/useApi.jsx";
@@ -6,12 +6,13 @@ import ApiEndPoint from "../api/Constants/ApiEndPoint";
 import { toast } from "react-toastify";
 import { decrypt } from "../utils/webCrypto";
 import { Eye, EyeOff } from "lucide-react";
-import { AuthContext } from "../context/AuthProvider.jsx";
+import { useAuth } from "../context/AuthProvider.jsx";
 const Login = () => {
-  const { login } = useContext(AuthContext);
+
+  const { login } = useAuth();
   const navigate = useNavigate();
   const { postDataWithOutToken, loading } = useApi();
-
+  const [serverError, setServerError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -30,14 +31,13 @@ const Login = () => {
         .catch(() => console.warn("Invalid stored data"));
     }
   }, []);
-
-  // Login Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     let valid = true;
     setEmailError("");
     setPasswordError("");
+    setServerError("");
 
     // Required checks
     if (!email.trim()) {
@@ -56,27 +56,26 @@ const Login = () => {
       setEmailError("Invalid email format");
       valid = false;
     }
-
     if (!valid) return;
+    try {
+      const payload = { email, password };
+      const res = await postDataWithOutToken(ApiEndPoint.LOGIN, payload);
 
-    const payload = { email, password };
-    const res = await postDataWithOutToken(ApiEndPoint.LOGIN, payload);
-
-    // Backend error (wrong password / invalid credentials)
-    if (res?.code === 400) {
-      toast.error(res.message);
-
-      // Optional: only clear password
-      setPassword("");
-      return;
+      if (res) {
+        const { token, user } = res;
+        login(user, token);
+        toast.success(res.message);
+        setTimeout(() => navigate("/dashboard"), 100);
+      }
+    } catch (error) {
+      const backendMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Login failed";
+      setServerError(backendMessage);
     }
 
-    if (res) {
-       const { token, user } = res;
-      login( user, token );
-      toast.success(res.message);
-      setTimeout(() => navigate("/dashboard"), 100);
-    }
+
   };
 
   return (
@@ -102,6 +101,9 @@ const Login = () => {
             Login
           </h1>
 
+          {serverError && (
+            <p className="text-red-500 text-sm text-center">{serverError}</p>
+          )}
           <p className="text-gray-500 text-center mb-8">
             Enter your credentials
           </p>

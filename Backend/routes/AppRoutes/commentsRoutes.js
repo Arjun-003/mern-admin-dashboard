@@ -1,4 +1,4 @@
-import commentsController from "../controllers/commentsController.js";
+import commentsController from "../../controllers/AppController/commentsController.js";
 import express from "express";
 const router = express.Router();
 // Route to create a new comment

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useContext } from "react";
 import api from "../api/axios.js";
 import { useParams } from "react-router-dom";
 import socket from "../api/SocketIo.js";
-import { AuthContext } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthProvider.jsx";
 
 const ChatWindow = () => {
 
@@ -10,7 +10,7 @@ const ChatWindow = () => {
   const [input, setInput] = useState("");
   const [product, setProduct] = useState(null);
 
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
 
   const senderId = user?.id;
   const { receiverId, productId } = useParams();

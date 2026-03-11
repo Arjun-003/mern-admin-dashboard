@@ -5,23 +5,25 @@ import http from "http"; // ✅ ADD
 import { fileURLToPath } from "url";
 import sequelize from './config/DBconnection.js';
 import initSocket from './config/SocketServer.js';
-import userRoutes from './routes/userRoutes.js';
-import comments from './routes/commentsRoutes.js';
-import producting from "./routes/productImgRoute.js";
-import likeProductRoute from "./routes/likeProductRoute.js";
-import chatData from './routes/ChatRoutes.js';
-import AdminDash from './routes/AdminRoutes/dashBoardRoutes.js';
 import './models/index.js';
 
+// App Routes
+import userRoutes from './routes/AppRoutes/userRoutes.js';
+import comments from './routes/AppRoutes/commentsRoutes.js';
+import producting from "./routes/AppRoutes/productImgRoute.js";
+import likeProductRoute from "./routes/AppRoutes/likeProductRoute.js";
+import chatData from './routes/AppRoutes/ChatRoutes.js';
+
 // Admin Routes
+import AdminDash from './routes/AdminRoutes/dashBoardRoutes.js';
 import categoryRoutes from './routes/AdminRoutes/categoryRoutes.js';
 import SubCatRoutes from './routes/AdminRoutes/SubCatRoutes.js';
 import userPageRoutes from './routes/AdminRoutes/userPageRoutes.js';
+import productRoutes from './routes/AdminRoutes/ProductRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log(__filename , "File Name");
-console.log(__dirname, "Directory Name");
+
 const app = express();
 
 // Middlewares
@@ -37,7 +39,6 @@ app.use(
     credentials: true,
   })
 );
-
 // Static
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -53,7 +54,7 @@ app.use('/', likeProductRoute);
 // Admin Routes
 app.use('/api', AdminDash);
 app.use('/api', userPageRoutes);
-
+app.use('/api', productRoutes);
 
 // 🔑 CREATE HTTP SERVER
 const server = http.createServer(app);

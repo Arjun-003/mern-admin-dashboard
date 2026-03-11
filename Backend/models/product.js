@@ -39,6 +39,10 @@ const product = sequelize.define("product", {
         type: DataTypes.STRING,
         allowNull: false
     },
+    status: {
+        type: DataTypes.ENUM("active", "inactive", "sold"),
+        defaultValue: "active"
+    },
     sellerId:{
         type: Sequelize.UUID,
         allowNull:false,
@@ -66,7 +70,7 @@ const product = sequelize.define("product", {
 }, 
 );
 // Auto-generate slug before creating
-// sequelize.sync({force:true})
+// product.sync({force:true})
 product.beforeCreate((product) => {
     product.slug = slugify(product.name, { lower: true });
 });

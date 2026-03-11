@@ -5,31 +5,28 @@ import Popup from 'reactjs-popup';
 import { MdChevronLeft } from "react-icons/md";
 import { MdChevronRight } from "react-icons/md";
 import { IoIosHeart } from "react-icons/io";
-import { AuthContext } from '../context/AuthContext.jsx';
+import { useAuth } from '../context/AuthProvider.jsx';
 
 
 const ProductDetail = () => {
 
     const navigate = useNavigate()
-    const { user, token, loading } = useContext(AuthContext);
+    const { user, token, loading } = useAuth();
     const [product, setProduct] = useState(null)
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isLiked, setIsLiked] = useState(false);
     const [seller, setSeller] = useState([])
     const { id } = useParams()
+    console.log(id, "this is the id from the url");
     //    For fetching the product data
     useEffect(() => {
         const getProduct = async () => {
-            const response = await api.get(`/singleProduct/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await api.get(`/singleProduct/${id}`);
             setProduct(response.data)
             console.log(response.data);
         }
         getProduct()
-    }, [token, loading, id]);
+    }, [id]);
 
     // For fetching the seller data
     useEffect(() => {
@@ -66,7 +63,7 @@ const ProductDetail = () => {
             });
             if (response.status === 200) {
                 alert("Product deleted successfully");
-                navigate("/profile"); // Redirect to profile after deletion
+                navigate("/profile",{ replace: true });
             } else {
                 alert("Failed to delete product");
             }

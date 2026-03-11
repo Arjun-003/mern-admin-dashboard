@@ -14,5 +14,6 @@ router.put(
 // User Status Change
 router.put('/userStatusChange', userController.updateUserStatus);
 router.get('/userDetail/:userId', userController.userDetail);
+router.get('/sellerDetail/:sellerId', userController.sellerDetail);
 
 export default router;

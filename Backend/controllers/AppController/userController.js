@@ -1,15 +1,14 @@
-import users from "../models/users.js";
+import users from "../../models/users.js";
 import fs from "fs";
 import bcrypt from "bcrypt"
-import userSchema from "../Validations/users_validation.js";
+import userSchema from "../../Validations/users_validation.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import redisClient from "../config/redisClient.js";
+import redisClient from "../../config/redisClient.js";
 import crypto from "crypto";
-import { sendOTP } from "../utils/twilio.js";
-import { sendMail } from "../utils/mailer.js";
+import { sendOTP } from "../../utils/twilio.js";
+import { sendMail } from "../../utils/mailer.js";
 import path from "path";
-import Products from "../models/product.js";
 dotenv.config();
 // Created a Object to hold all user-related controller functions
 const usersdata = {
@@ -167,6 +166,9 @@ getAllUsers: async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (!passwordMatch) {
                 return res.status(401).json({ error: "Password Didn't Matched ! " })
+            }
+            if (user.status === "inactive") {
+                return res.status(403).json({ error: "Your Account is Blocked. Please Contact Support." });
             }
             const token = jwt.sign({
                 id: user.id,

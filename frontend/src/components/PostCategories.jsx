@@ -1,11 +1,11 @@
-import { useContext, useState } from "react";
-import { CatContext } from "../context/CategoriesContext.jsx";
+import { useState } from "react";
+import { useCat } from "../context/CategoriesContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 const PostCategories = () => {
   const navigate = useNavigate();
 
-  const { categories, subCategories } = useContext(CatContext);
+  const { categories, subCategories } = useCat();
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");

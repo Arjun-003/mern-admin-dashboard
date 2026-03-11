@@ -1,13 +1,12 @@
 import User from "../../models/users.js";
 import fs from "fs/promises";
 import path from "path";
+import { getIo } from "../../config/SocketServer.js";
 
 const userController = {
     updateUserStatus: async (req, res) => {
         try {
             const { userId, status } = req.body;
-
-            // 1️⃣ Validation
             if (!userId || !status) {
                 return res.status(400).json({
                     success: false,
@@ -24,7 +23,6 @@ const userController = {
 
             // 2️⃣ Find user
             const user = await User.findByPk(userId);
-
             if (!user) {
                 return res.status(404).json({
                     success: false,
@@ -34,14 +32,23 @@ const userController = {
 
             // 3️⃣ Update status
             user.status = status;
+            
             await user.save();
 
+            // 4️⃣ Emit real-time update
+           if (user.status === "inactive") {
+                const io = getIo();
+                io.to(`user:${user.id}`).emit("forceLogout", {
+                    message: "Your account has been deactivated. Please contact support.",
+                });
+            }
+            
             // 4️⃣ Success response
             return res.status(200).json({
                 success: true,
                 message: "User status updated successfully",
                 data: {
-                    userId: user._id,
+                    userId: user.id,
                     status: user.status,
                 },
             });
@@ -71,6 +78,28 @@ const userController = {
             });
         } catch (error) {
             console.error("🔥 USER DETAIL ERROR:", error);
+            return res.status(500).json({
+                success: false,
+                message: error.message,
+            });
+        }
+    },
+    sellerDetail: async (req, res) => {
+        try {
+            const { sellerId } = req.params;
+            const user = await User.findByPk(sellerId);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Seller not found",
+                });
+            }
+            return res.status(200).json({
+                success: true,
+                data: user,
+            });
+        } catch (error) {
+            console.error("🔥 SELLER DETAIL ERROR:", error);
             return res.status(500).json({
                 success: false,
                 message: error.message,

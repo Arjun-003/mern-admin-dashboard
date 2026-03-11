@@ -1,13 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
-import { CatContext } from "../context/CategoriesContext.jsx";
+import { useCat } from "../context/CategoriesContext.jsx";
 
 const Main = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { categories, subCategories } = useContext(CatContext)
+  const { categories, subCategories } = useCat();
   const [postData, setPostData] = useState([]);
 
   const [priceRange, setPriceRange] = useState(

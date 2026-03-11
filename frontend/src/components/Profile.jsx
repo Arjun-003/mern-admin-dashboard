@@ -1,13 +1,13 @@
-import { useState, useContext, useEffect } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState, useEffect } from "react";
 import api from "../api/axios.js";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider.jsx";
 
 
 const Profile = () => {
 
   const navigate = useNavigate();
-  const { user, token, updateUser, logout } = useContext(AuthContext); //Authenicated data 
+  const { user, token, updateUser, logout } = useAuth(); //Authenicated data 
   const [product, setProduct] = useState([]) // product data of user 
   const [isEditing, setIsEditing] = useState(false); // for Disabling Enabling the fields 
   const [imageError, setImageError] = useState(false);
@@ -218,7 +218,7 @@ const Profile = () => {
             onClick={() => {
               if (window.confirm(`You Really want to Logout !`)) {
                 logout();
-                navigate('/')
+                navigate('/',{replace: true})
               } else {
                 alert('Glad you Stayed')
               }

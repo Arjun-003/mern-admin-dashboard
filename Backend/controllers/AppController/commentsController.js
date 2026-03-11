@@ -1,5 +1,5 @@
-import comment from "../models/comments.js";
-import users from "../models/users.js";
+import comment from "../../models/comments.js";
+import users from "../../models/users.js";
 
 const commentsController = {
     // Create a new comment

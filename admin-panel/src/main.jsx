@@ -6,7 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { AuthProvider } from './context/AuthProvider.jsx';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Router basename="/admin">
+    <Router>
       <AuthProvider>
       <App />
       </AuthProvider>

@@ -1,7 +1,7 @@
-import usersdata from "../controllers/userController.js";
+import usersdata from "../../controllers/AppController/userController.js";
 import express from "express";
-import verifyToken from "../middleware/verifytoken.js";
-import userAvatarUpload from "../middleware/userAvatarUpload.js";
+import verifyToken from "../../middleware/verifytoken.js";
+import userAvatarUpload from "../../middleware/userAvatarUpload.js";
 const router = express.Router();
 
 router.get('/getAllUsers', usersdata.getAllUsers);

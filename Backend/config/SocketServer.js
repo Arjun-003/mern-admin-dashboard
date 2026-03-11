@@ -3,9 +3,10 @@ import Chat from "../models/chats.js";
 import Messages from "../models/messages.js";
 import { Op } from "sequelize";
 
+let io;
 const initSocket = (server) => {
 
-  const io = new Server(server, {
+  io = new Server(server, {
     cors: {
       origin: (origin, callback) => {
         const allowedOrigins = [
@@ -173,16 +174,18 @@ const initSocket = (server) => {
       }
 
     });
-
-
     socket.on("disconnect", () => {
 
       console.log("Socket disconnected:", socket.id);
-
     });
-
   });
+  return io;
+};
 
+export const getIo = () => {
+  if (!io) {
+    throw new Error("Socket.io not initialized");
+  }
   return io;
 };
 

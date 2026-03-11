@@ -2,11 +2,11 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
 import socket from "../api/SocketIo.js";
-import { AuthContext } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/AuthProvider.jsx";
 
 const ChatBox = () => {
 
-  const { user, token, loading } = useContext(AuthContext);
+  const { user, token, loading } = useAuth();
   const userId = user?.id;
   const navigate = useNavigate();
 

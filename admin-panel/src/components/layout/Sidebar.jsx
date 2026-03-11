@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Home,
   Users,
+  ShoppingCart,
   FileText,
   HelpCircle,
   Info,
@@ -13,7 +14,7 @@ import {
   Activity,
   Briefcase,
   CreditCard,
-  CalendarCheck,
+  
   Bell,
   AlertTriangle,
   Receipt,
@@ -54,7 +55,7 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
         <div className="w-36 h-25 overflow-hidden">
           {" "}
           <img
-            src="./logo.png"
+            src="/public/logo.png"
             alt="Logo"
             className="w-full h-full object-contain"
           />
@@ -83,19 +84,19 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }) => {
               label: "Users",
             },
             {
-              to: "/providers_listing",
+              to: "/Seller_listing",
               routes: [
-                "/providers_listing",
-                "/providers_edit",
-                "/providers_view",
+                "/Seller_listing",
+                "/Seller_edit",
+                "/Seller_view",
               ],
               icon: <Briefcase />,
               label: "Sellers",
             },
             {
-              to: "/bookings_listing",
-              routes: ["/bookings_listing", "/bookings_view"],
-              icon: <CalendarCheck />,
+              to: "/products_listing",
+              routes: ["/products_listing", "/products_view"],
+              icon: <ShoppingCart/>,
               label: "Products",
             },
             {

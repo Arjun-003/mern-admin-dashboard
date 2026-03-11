@@ -2,6 +2,9 @@ import Users from "../../models/users.js";
 import Product from "../../models/product.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
+// import { sendOTP } from "../../utils/sendOTP.js";
+// import { sendMail } from "../../utils/sendMail.js";
 
 const dashBoard = {
     dashboardData: async (req, res) => {
@@ -25,28 +28,28 @@ const dashBoard = {
         productCount: totalProducts
       }
     });
-    console.log(totalUsers);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to fetch dashboard data" });
-  }
+}
      },
  
-getAllUsers : async (req, res) => {
+getAllUsers: async (req, res) => {
   try {
     const {
       page = 1,
       limit = 10,
       search = "",
-      role,
-      status,
     } = req.query;
 
     const pageNumber = parseInt(page);
     const pageSize = parseInt(limit);
     const offset = (pageNumber - 1) * pageSize;
 
-    const whereCondition = {};
+    const whereCondition = {
+      role: { [Op.ne]: "admin" }, // 🚫 always exclude admin
+      status: { [Op.in]: ["active", "inactive"] } // 🚦 only active & inactive
+    };
 
     // 🔍 Search by name, email, mobile
     if (search) {
@@ -57,20 +60,10 @@ getAllUsers : async (req, res) => {
       ];
     }
 
-    // 🎭 Role filter
-    if (role) {
-      whereCondition.role = role; // user | admin | seller
-    }
-
-    // 🚦 Status filter
-    if (status) {
-      whereCondition.status = status; // active | inactive | banned
-    }
-
     const { rows, count } = await Users.findAndCountAll({
       where: whereCondition,
       attributes: {
-        exclude: ["password"], // 🔐 never send password
+        exclude: ["password"],
       },
       limit: pageSize,
       offset: offset,
@@ -95,7 +88,64 @@ getAllUsers : async (req, res) => {
       message: "Failed to fetch users",
     });
   }
-  },
+},
+getAllSellers: async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+    } = req.query;
+
+    const pageNumber = parseInt(page);
+    const pageSize = parseInt(limit);
+    const offset = (pageNumber - 1) * pageSize;
+
+    const whereCondition = {
+      role: "seller",// 🚫 always exclude admin
+      status: { [Op.in]: ["active", "inactive"] } // 🚦 only active & inactive
+    };
+
+    // 🔍 Search by name, email, mobile
+    if (search) {
+      whereCondition[Op.or] = [
+        { name: { [Op.like]: `%${search}%` } },
+        { email: { [Op.like]: `%${search}%` } },
+        { mobile_Number: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    const { rows, count } = await Users.findAndCountAll({
+      where: whereCondition,
+      attributes: {
+        exclude: ["password"],
+      },
+      limit: pageSize,
+      offset: offset,
+      order: [["createdAt", "DESC"]],
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: rows,
+      pagination: {
+        totalRecords: count,
+        currentPage: pageNumber,
+        totalPages: Math.ceil(count / pageSize),
+        pageSize: pageSize,
+      },
+    });
+
+  } catch (error) {
+    console.error("Get All Users Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch users",
+    });
+  }
+},
+
+
 singleUser: async (req, res) => {
         const { id } = req.params;
         try {
@@ -106,7 +156,7 @@ singleUser: async (req, res) => {
         }
     },
 
-    updateProfile: async (req, res) => {
+updateProfile: async (req, res) => {
         try {
             const userId = req.user.id;
             const user = await Users.findByPk(userId);
@@ -149,7 +199,7 @@ singleUser: async (req, res) => {
         }
     },
 
-    sign_up: async (req, res) => {
+sign_up: async (req, res) => {
         try {
             const { name, email, mobile_Number, password, confirmpassword, role } = req.body;
             const { error } = userSchema.validate({ name, email, mobile_Number, password });
@@ -176,7 +226,7 @@ singleUser: async (req, res) => {
             return res.status(500).json({ error: 'Failed to send OTP' });
         }
     },
-    verifyOtp: async (req, res) => {
+verifyOtp: async (req, res) => {
         try {
             const { otp, mobile_Number } = req.body;
             const storedOtp = await redisClient.get(`otp_${mobile_Number}`);
@@ -236,6 +286,9 @@ singleUser: async (req, res) => {
             if (!user) {
                 return res.status(401).json({ error: 'User Not Found !' });
             }
+            if (user.role !== "admin") {
+                return res.status(403).json({ error: "Access denied. Admins only." });
+            }
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (!passwordMatch) {
                 return res.status(401).json({ error: "Password Didn't Matched ! " })
@@ -255,6 +308,7 @@ singleUser: async (req, res) => {
                     email: user.email,
                     mobile_Number: user.mobile_Number,
                     role: user.role,
+                    status: user.status,
                     profile_image: user.profile_image || null
                 }
             });
@@ -264,46 +318,43 @@ singleUser: async (req, res) => {
             return res.status(500).json({ error: 'Failed to login' });
         }
     },
-    logout: async (req, res) => {
-        try {
+    // logout: async (req, res) => {
+    //     try {
+            
+    //         const token = req.headers.authorization?.split(" ")[1];
 
-            const token = req.headers.authorization?.split(" ")[1];
+    //         if (!token) {
+    //             return res.status(400).json({ message: "No token provided" });
+    //         }
 
-            if (!token) {
-                return res.status(400).json({ message: "No token provided" });
-            }
+    //         // Store token in Redis blacklist with expiry
+    //         const decoded = jwt.decode(token);
 
-            // Store token in Redis blacklist with expiry
-            const decoded = jwt.decode(token);
+    //         if (!decoded?.exp) {
+    //             return res.status(400).json({ message: "Invalid token" });
+    //         }
+    //         const expiryTime = decoded.exp - Math.floor(Date.now() / 1000);
+    //         if (expiryTime > 0) {
+    //             await redisClient.setEx(`blacklist_${token}`, expiryTime, "blacklisted");
+    //         }
+    //         return res.status(200).json({ message: "Logout successful" });
 
-            if (!decoded?.exp) {
-                return res.status(400).json({ message: "Invalid token" });
-            }
+    //     } catch (error) {
+    //         console.error(error);
+    //         return res.status(500).json({ message: "Logout failed" });
+    //     }
+    // },
 
-            const expiryTime = decoded.exp - Math.floor(Date.now() / 1000);
-
-            if (expiryTime > 0) {
-                await redisClient.setEx(`blacklist_${token}`, expiryTime, "blacklisted");
-            }
-
-            return res.status(200).json({ message: "Logout successful" });
-
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: "Logout failed" });
-        }
-    },
-
-    profile: async (req, res) => {
-        try {
-            const user = await users.findByPk(req.user.id, {
-                attributes: ["id", "name", "email", "profile_image", "role", "mobile_Number"]
-            });
-            return res.json({ message: "Profile fetched successfully", user });
-        } catch (error) {
-            return res.status(500).json({ message: error.message });
-        }
-    },
+    // profile: async (req, res) => {
+    //     try {
+    //         const user = await users.findByPk(req.user.id, {
+    //             attributes: ["id", "name", "email", "profile_image", "role", "mobile_Number"]
+    //         });
+    //         return res.json({ message: "Profile fetched successfully", user });
+    //     } catch (error) {
+    //         return res.status(500).json({ message: error.message });
+    //     }
+    // },
     forgotPassword: async (req, res) => {
         try {
             const { email } = req.body

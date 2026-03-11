@@ -5,14 +5,25 @@ const ApiEndPoint = {
   updateProfile: "/adminProfileUpdate",
   changePassword: "/changePassword",
   DASHBOARD_DATA: "/dashboard",
-
+  
   getAllUser: "/getAllUser",
   userStatusChange: "/userStatusChange",
   userBanChange: "/userBanChange",
   deleteUser: "/deleteUser",
   userDetail: "/userDetail",
   removeUserImage: "/removeUserImage",
+  
+  getAllSellers: "/getAllSellers",
+  sellerDetail: "/sellerDetail",
+  sellerBadgeChange: "/sellerBadgeChange",
+  deleteSeller: "/deleteUser",
+  approveSeller: "/approveSeller",
 
+  getAllProducts: "/getAllProducts",
+  getSingleProduct: "/getSingleProduct",
+  deleteProduct: "/deleteProduct",
+  updateProductStatus: "/updateProductStatus",
+  
   cms: "/cms",
   cmsUpdate: "/cmsUpdate",
 
@@ -34,12 +45,7 @@ const ApiEndPoint = {
   categoryDetail: "/categoryDetail",
   deleteCategory: "/deleteCategory",
 
-  taglineList: "/taglineList",
-  addTagline: "/addTagline",
-  editTagline: "/editTagline",
-  taglineDetail: "/taglineDetail",
-  deleteTagline: "/deleteTagline",
-
+  
   activityList: "/activityList",
   addActivity: "/addActivity",
   editActivity: "/editActivity",
@@ -50,11 +56,6 @@ const ApiEndPoint = {
   contactUsDelete: "/contactUsDelete",
   contactUsView: "/contactUsDetail",
 
-  getAllProvider: "/allProviders",
-  providerBadgeChange: "/providerBadgeChange",
-  deleteProvider: "/deleteUser",
-  providerDetail: "/providerDetail",
-  approveProvider: "/approveProvider",
 
   subscriptionList: "/subscriptionList",
   addSubscription: "/addSubscription",

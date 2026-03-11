@@ -30,14 +30,14 @@ Comments.belongsTo(Comments, {
 Category.hasMany(SubCategory, { foreignKey: "categoryId" });
 SubCategory.belongsTo(Category, { foreignKey: "categoryId" });
 
-Users.hasMany(Product, { foreignKey: "userId" });
-Product.belongsTo(Users, { foreignKey: "userId" });
+Users.hasMany(Product, { foreignKey: "sellerId", as: "userProducts" });
+Product.belongsTo(Users, { foreignKey: "sellerId", as: "productUser" });
 
-SubCategory.hasMany(Product, { foreignKey: "SubCategoryId" });
-Product.belongsTo(SubCategory, { foreignKey: "SubCategoryId" });
+SubCategory.hasMany(Product, { foreignKey: "SubCategoryId" , as: "subCategoryProducts"});
+Product.belongsTo(SubCategory, { foreignKey: "SubCategoryId", as: "productSubCategory" });
 
-Category.hasMany(Product, { foreignKey: "categoryId" });
-Product.belongsTo(Category, { foreignKey: "categoryId" });
+Category.hasMany(Product, { foreignKey: "categoryId", as: "categoryProducts" });
+Product.belongsTo(Category, { foreignKey: "categoryId", as: "productCategory" });
 
 Product.hasMany(ProductImage, { foreignKey: "productId", as: "images" });
 ProductImage.belongsTo(Product, { foreignKey: "productId", as: "product" });

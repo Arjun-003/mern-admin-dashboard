@@ -1,4 +1,4 @@
-import{ useState, useEffect, useRef } from "react";
+import{ useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -65,7 +65,7 @@ const stats = [
     title: "Sellers",
     count: statsData.sellerCount,
     icon: <Briefcase size={20} />,
-    path: "/providers_listing",
+    path: "/Seller_listing",
   },
   {
     title: "Products",

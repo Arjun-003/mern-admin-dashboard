@@ -1,9 +1,9 @@
 import { Op } from "sequelize";
-import Chat from "../models/chats.js";
-import Messages from "../models/messages.js";
-import User from "../models/users.js";
-import Product from "../models/product.js";
-import ProductImage from "../models/productImage.js";
+import Chat from "../../models/chats.js";
+import Messages from "../../models/messages.js";
+import User from "../../models/users.js";
+import Product from "../../models/product.js";
+import ProductImage from "../../models/productImage.js";
 
 const ChatData = {
 

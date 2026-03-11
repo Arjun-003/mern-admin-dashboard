@@ -4,6 +4,7 @@ import express from "express";
 
 const router = express.Router();
 router.get("/getAllUser",verifyToken, AdminDash.getAllUsers);
+router.get("/getAllSellers",verifyToken, AdminDash.getAllSellers);
 router.get("/dashboard",verifyToken, AdminDash.dashboardData);
 router.post("/login", AdminDash.login);
 

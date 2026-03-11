@@ -31,11 +31,13 @@ function UserList() {
   const [users, setUsers] = useState([]);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+
   const [entriesPerPage, setEntriesPerPage] = useState(initialState.limit);
   const [currentPage, setCurrentPage] = useState(initialState.page);
+  const [searchQuery, setSearchQuery] = useState(initialState.search);
+
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [searchQuery, setSearchQuery] = useState(initialState.search);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(
     initialState.search
   );
@@ -68,7 +70,7 @@ function UserList() {
         const response = await getData(
           `${ApiEndPoint.getAllUser}?${queryParams.toString()}`
         );
-        console.log(response.data,"user data ");
+        console.log(response.data, "user data ");
         if (response.success) {
           setUsers(response.data || []);
           setTotalRecords(response.pagination.totalRecords || 0);
@@ -116,9 +118,9 @@ function UserList() {
 
 
   const handleStatusChange = async (userId, newStatus) => {
-    console.log(userId, newStatus,'userID and name');
+    console.log(userId, newStatus, 'userID and name');
     try {
-      
+
       setStatusUpdateLoading(true);
 
       const data = {
@@ -132,7 +134,8 @@ function UserList() {
         false
       );
 
-      if (response.success) {
+      console.log(response.data.success, 'status change response');
+      if (response.data.success) {
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
             user.id === userId
@@ -209,6 +212,9 @@ function UserList() {
         text: error?.response?.data?.message || "Something went wrong!",
       });
     }
+  };
+  const getInitials = (name = "") => {
+    return name.split(" ").join("").substring(0, 2).toUpperCase();
   };
   // Calculate display indices
   const startIndex = (currentPage - 1) * entriesPerPage + 1;
@@ -366,19 +372,17 @@ function UserList() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {user.mobile_Number || "N/A"}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 ">
                         {user.profile_image ? (
                           <img
-                            src={`${ApiEndPoint.IMAGE_BASE_URL}/${user.profile_image}`}
-                            alt="Profile"
+                            src={`${ApiEndPoint.IMAGE_BASE_URL}${user.profile_image}`}
+                            alt="User"
                             className="h-10 w-10 rounded-full object-cover"
                           />
                         ) : (
-                          <img
-                            src={`https://cdn-icons-png.flaticon.com/512/149/149071.png`}
-                            alt="Profile"
-                            className="h-10 w-10 rounded-full object-cover"
-                          />
+                          <span className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            {getInitials(user?.name || "NA")}
+                          </span>
                         )}
                       </td>
 
@@ -422,12 +426,12 @@ function UserList() {
 
                         {/* Edit Button */}
                         {/* <button
-                          onClick={() => navigate(`/users_edit/${user.id}`)}
-                          className="text-green-600 hover:text-green-800"
-                          title="Edit"
-                        >
-                          <Pencil size={18} />
-                        </button> */}
+                            onClick={() => navigate(`/users_edit/${user.id}`)}
+                            className="text-green-600 hover:text-green-800"
+                            title="Edit"
+                          >
+                            <Pencil size={18} />
+                          </button> */}
 
                         {/* Delete Button */}
                         <button

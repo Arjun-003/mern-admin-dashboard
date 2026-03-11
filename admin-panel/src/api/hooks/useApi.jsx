@@ -25,6 +25,7 @@ const useApi = () => {
     setLoading(true);
     setError(null);
     try {
+      
       const res = await api.get(`${endpoint}/${id}`);
       return res.data;
     } catch (err) {
@@ -34,7 +35,8 @@ const useApi = () => {
       setLoading(false);
     }
   };
-
+  
+  
   // ✅ POST
   const postData = async (endpoint, body) => {
     setLoading(true);
@@ -81,7 +83,7 @@ const useApi = () => {
       setLoading(false);
     }
   };
-
+  
   // ✅ PATCH
   const updateRecord = async (endpoint, body) => {
     setLoading(true);
