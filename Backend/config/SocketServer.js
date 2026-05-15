@@ -10,8 +10,8 @@ const initSocket = (server) => {
     cors: {
       origin: (origin, callback) => {
         const allowedOrigins = [
-          "http://localhost:5173",
-          "http://localhost:5174"
+          "http://localhost:5173", //Web site 
+          "http://localhost:5174" // Admin panel
         ];
 
         if (!origin || allowedOrigins.includes(origin)) {

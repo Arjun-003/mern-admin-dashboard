@@ -39,10 +39,10 @@ const ChatBox = () => {
         prev.map(chat =>
           chat.id === msg.chatId
             ? {
-                ...chat,
-                lastMessage: msg,
-                unreadCount: (chat.unreadCount || 0) + 1
-              }
+              ...chat,
+              lastMessage: msg,
+              unreadCount: (chat.unreadCount || 0) + 1
+            }
             : chat
         )
       );
@@ -63,68 +63,72 @@ const ChatBox = () => {
         <div className="px-4 py-3 border-b font-semibold">Chats</div>
 
         <div className="divide-y">
-          
-          {chats.map(chat => {
 
-            const otherUser =
-              chat.sender.id === userId ? chat.receiver : chat.sender;
+          {chats.length >= 1 ?
 
-            const productName = chat.product?.name || "Item no longer available";
+            chats.map(chat => {
 
-            const productImage =
-              chat.product?.images?.[0]?.imageUrl
-                ? `http://localhost:5000/${chat.product.images[0].imageUrl}`
-                : "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+              const otherUser =
+                chat.sender.id === userId ? chat.receiver : chat.sender;
 
-            return (
+              const productName = chat.product?.name || "Item no longer available";
 
-              <div
-                key={chat.id}
-                onClick={() =>
-                  navigate(`/chat-window/${otherUser.id}/${chat.productId}`)
-                }
-                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
-              >
+              const productImage =
+                chat.product?.images?.[0]?.imageUrl
+                  ? `http://localhost:5000/${chat.product.images[0].imageUrl}`
+                  : "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-                <div className="relative h-10 w-10">
+              return (
 
-                  <img
-                    src={productImage}
-                    className="h-full w-full rounded-full object-cover"
-                  />
+                <div
+                  key={chat.id}
+                  onClick={() =>
+                    navigate(`/chat-window/${otherUser.id}/${chat.productId}`)
+                  }
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                >
 
-                  <img
-                    src={
-                      otherUser?.profile_image
-                        ? `http://localhost:5000/${otherUser.profile_image}`
-                        : "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                    }
-                    className="absolute bottom-0 right-0 h-6 w-6 rounded-full border-2 border-white object-cover"
-                  />
+                  <div className="relative h-10 w-10">
 
-                </div>
+                    <img
+                      src={productImage}
+                      className="h-full w-full rounded-full object-cover"
+                    />
 
-                <div className="flex-1">
-                  <p className="font-medium text-sm">
-                    {otherUser?.name} - {productName}
-                  </p>
+                    <img
+                      src={
+                        otherUser?.profile_image
+                          ? `http://localhost:5000/${otherUser.profile_image}`
+                          : "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                      }
+                      className="absolute bottom-0 right-0 h-6 w-6 rounded-full border-2 border-white object-cover"
+                    />
 
-                  <p className="text-xs text-gray-500 truncate">
-                    {chat.lastMessage?.message}
-                  </p>
-                </div>
-
-                {chat.unreadCount > 0 && (
-                  <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                    {chat.unreadCount}
                   </div>
-                )}
 
-              </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">
+                      {otherUser?.name} - {productName}
+                    </p>
 
-            );
+                    <p className="text-xs text-gray-500 truncate">
+                      {chat.lastMessage?.message}
+                    </p>
+                  </div>
 
-          })}
+                  {chat.unreadCount > 0 && (
+                    <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      {chat.unreadCount}
+                    </div>
+                  )}
+
+                </div>
+
+              );
+
+            }) : (
+              <h3 className="p-6 font-medium text-sm ">No Chats Found</h3>
+            )}
 
         </div>
 

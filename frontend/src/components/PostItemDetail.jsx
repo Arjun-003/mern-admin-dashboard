@@ -23,7 +23,7 @@ const PostItemDetail = () => {
         const { name, value } = e.target;
         setProduct((prev) => ({ ...prev, [name]: value }));
     };
-    
+
     const handleRemoveImage = (index) => {
         setImages((prev) => {
             const updated = [...prev];
@@ -94,14 +94,19 @@ const PostItemDetail = () => {
                         multiple
                         className="hidden"
                         onChange={(e) => {
-                            const selectedFiles = Array.from(e.target.files);
-
+                            
+                            const selectedFiles = Array.from(e.target.files);                         
+                            console.log(selectedFiles);
                             setImageFiles((prevFiles) => {
+                               
+                    
                                 const combinedFiles = [...prevFiles, ...selectedFiles].slice(0, 10);
                                 return combinedFiles;
                             });
 
                             setImages((prevImages) => {
+                               
+                                
                                 const newUrls = selectedFiles.map((file) =>
                                     URL.createObjectURL(file)
                                 );

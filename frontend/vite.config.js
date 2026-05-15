@@ -7,7 +7,7 @@ export default defineConfig({
   server:{
     port: 5173,
     strictPort: true, // Exit if the port is already in use
-
+    open : true
    }
   
 })

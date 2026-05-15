@@ -31,6 +31,76 @@ const productData = {
         }
     },
 
+    getallproducts: async (req, res) => {
+        try {
+            const { search, subCategoryId, minPrice, maxPrice, sortBy, page = 1, limit = 6 } = req.query;
+            const where = {};
+
+
+            const currentPage = Number(page) || 1;
+            const currentLimit = Number(limit) || 4;
+
+            const offset = (currentPage - 1) * currentLimit;
+            // 🔍 Search
+            if (search) {
+                where.name = {
+                    [Op.like]: `%${search}%`
+                };
+            }
+            // 🧩 SubCategory
+            if (subCategoryId) {
+                where.SubCategoryId = subCategoryId;
+            }
+            // 💰 Price filter (FIXED)
+            const min =
+                minPrice !== undefined && minPrice !== ""
+                    ? Number(minPrice)
+                    : null;
+            const max =
+                maxPrice !== undefined && maxPrice !== ""
+                    ? Number(maxPrice)
+                    : null;
+
+            if (min !== null || max !== null) {
+                where.price = {};
+                if (min !== null) {
+                    where.price[Op.gte] = min;
+                }
+                if (max !== null) {
+                    where.price[Op.lte] = max;
+                }
+            }
+            // 🆕 Sort By
+            const order = [];
+            if (sortBy === "priceLowToHigh") {
+                order.push(["price", "ASC"]);
+            } else if (sortBy === "priceHighToLow") {
+                order.push(["price", "DESC"]);
+            } else if (sortBy === "newest") {
+                order.push(["createdAt", "DESC"]);
+            }
+
+            const products = await Product.findAndCountAll({
+                where,
+                order,
+                include: [
+                    {
+                        model: ProductImage,
+                        as: "images",
+                        separate: true,              // IMPORTANT
+                        order: [["order", "ASC"]],
+                    },
+                ],
+                limit: Number(limit),
+                offset
+            });
+
+            res.status(200).json(products);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to fetch products" });
+        }
+    },
 
     createProduct: async (req, res) => {
         try {
@@ -104,7 +174,6 @@ const productData = {
     },
     // 📌 DELETE A PRODUCT AND ITS IMAGES
     deleteProduct: async (req, res) => {
-        
         try {
 
             const { id } = req.params;
@@ -135,7 +204,6 @@ const productData = {
                         await fs.promises.unlink(imgPath);
                     }
                 } catch (err) {
-                    console.log("Image delete failed:", imgPath);
                 }
             }
             // ⭐ Delete DB records
@@ -159,75 +227,13 @@ const productData = {
 
 
     // 📌 GET ALL PRODUCTS WITH IMAGES
-    getallproducts: async (req, res) => {
-        try {
-            const { search, subCategoryId, minPrice, maxPrice, sortBy } = req.query;
-            const where = {};
-            // 🔍 Search
-            if (search) {
-                where.name = {
-                    [Op.like]: `%${search}%`
-                };
-            }
-            // 🧩 SubCategory
-            if (subCategoryId) {
-                where.SubCategoryId = subCategoryId;
-            }
-            // 💰 Price filter (FIXED)
-            const min =
-                minPrice !== undefined && minPrice !== ""
-                    ? Number(minPrice)
-                    : null;
-            const max =
-                maxPrice !== undefined && maxPrice !== ""
-                    ? Number(maxPrice)
-                    : null;
-
-            if (min !== null || max !== null) {
-                where.price = {};
-                if (min !== null) {
-                    where.price[Op.gte] = min;
-                }
-                if (max !== null) {
-                    where.price[Op.lte] = max;
-                }
-            }
-            // 🆕 Sort By
-            const order = [];
-            if (sortBy === "priceLowToHigh") {
-                order.push(["price", "ASC"]);
-            } else if (sortBy === "priceHighToLow") {
-                order.push(["price", "DESC"]);
-            } else if (sortBy === "newest") {
-                order.push(["createdAt", "DESC"]);
-            }
-
-            const products = await Product.findAll({
-                where,
-                order,
-                include: [
-                    {
-                        model: ProductImage,
-                        as: "images",
-                        separate: true,              // IMPORTANT
-                        order: [["order", "ASC"]],
-                    },
-                ],
-            });
-
-            res.status(200).json(products);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: "Failed to fetch products" });
-        }
-    },
 
     getSingleProduct: async (req, res) => {
         try {
-            const { id } = req.params; 
-            
+            const { id } = req.params;
+
             const product = await Product.findByPk(id, {
-                include: [  
+                include: [
                     {
                         model: ProductImage,
                         as: "images",

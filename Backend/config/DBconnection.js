@@ -7,7 +7,7 @@ const sequelize = new Sequelize( // Database connection configuration
     process.env.DB_USER,
     process.env.DB_PASSWORD, {  // Database connection parameters
         host: process.env.DB_HOST,
-        dialect: process.env.DB_DIALECT,
+        dialect: "mysql",
         logging: false
     });
 export default sequelize;

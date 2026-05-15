@@ -159,6 +159,8 @@ getAllUsers: async (req, res) => {
     login: async (req, res) => {
         try {
             const { email, password } = req.body;
+            console.log(email,password);
+            
             const user = await users.findOne({ where: { email } });
             if (!user) {
                 return res.status(401).json({ error: 'User Not Found !' });

@@ -14,6 +14,7 @@ import ProductDetail from "./components/ProductDetail.jsx";
 import ChatBox from "./components/ChatBox.jsx";
 import MainLayout from "./components/MainLayout.jsx";
 import ChatWindow from "./components/ChatWindow.jsx";
+// import Test from "./components/test.jsx";
 
 import { ProtectedRoute } from "./ProtectedRoutes.jsx";
 function App() {
@@ -23,6 +24,7 @@ function App() {
   return (
 
     <Routes>
+      {/* <Route path="test" element= { <Test/>} /> */}
       <Route path="/login" element={<Login />} />
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/verify-otp" element={<OtpSent />} />

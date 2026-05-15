@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import Pagination from '@mui/material/Pagination';
 import api from "../api/axios.js";
 import { useCat } from "../context/CategoriesContext.jsx";
 
 const Main = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const limit = 6;
   const { categories, subCategories } = useCat();
   const [postData, setPostData] = useState([]);
-
+  const page = Number(searchParams.get("page")) || 1;
   const [priceRange, setPriceRange] = useState(
     {
       min: "",
@@ -22,7 +24,6 @@ const Main = () => {
       try {
         const response = await api.get(`/productImages?${searchParams.toString()}`);
         setPostData(response.data);
-       
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
@@ -30,7 +31,7 @@ const Main = () => {
     fetchPosts();
   }, [searchParams]);
 
- 
+
 
   return (
     <>
@@ -41,34 +42,34 @@ const Main = () => {
         <aside className="w-64 bg-white shadow-md p-4">
           <h2 className="text-lg font-semibold mb-4 text-gray-700">Filters</h2>
 
-        <div className="border-b border-gray-300 mb-4">
-          <h2 className="text-md font-medium text-gray-600 mb-2">Sort By</h2>
-          <select
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            value={searchParams.get("sortBy") || ""}
-            
-            onChange={(e) => {
-              const value = e.target.value;
-              setSearchParams(prev => {
-                const params = new URLSearchParams(prev.toString());
-                if (value) {
-                  params.set("sortBy", value);
-                }
-                else {
-                  params.delete("sortBy");
-                }
-                return params;
-              });
-            }}
-          >
-            <option value="">Sort By </option>
-            <option value="priceLowToHigh">Price: Low to High</option>
-            <option value="priceHighToLow">Price: High to Low</option>
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-           </select>
+          <div className="border-b border-gray-300 mb-4">
+            <h2 className="text-md font-medium text-gray-600 mb-2">Sort By</h2>
+            <select
+              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={searchParams.get("sortBy") || ""}
 
-        </div>
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearchParams(prev => {
+                  const params = new URLSearchParams(prev.toString());
+                  if (value) {
+                    params.set("sortBy", value);
+                  }
+                  else {
+                    params.delete("sortBy");
+                  }
+                  return params;
+                });
+              }}
+            >
+              <option value="">Sort By </option>
+              <option value="priceLowToHigh">Price: Low to High</option>
+              <option value="priceHighToLow">Price: High to Low</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+
+          </div>
           {/* Category Filter */}
           <div className="mb-6">
             <h3 className="text-md font-medium text-gray-600 mb-2">Category</h3>
@@ -95,7 +96,7 @@ const Main = () => {
                               return params;
                             });
                           }}
-                  
+
                           className={
                             searchParams.get("subCategoryId") == subcate.id ? "font-medium bg-yellow-500 text-white p-2 rounded-md cursor-pointer" : "font-medium text-gray-600 cursor-pointer hover:text-yellow-400"
                           }
@@ -132,7 +133,7 @@ const Main = () => {
             </div>
           </div>
           {/* Clear Filters Button */}
-            <button className="w-full bg-gray-300 text-gray-700 font-semibold py-2 rounded-md hover:bg-gray-400 mb-4"
+          <button className="w-full bg-gray-300 text-gray-700 font-semibold py-2 rounded-md hover:bg-gray-400 mb-4"
             onClick={() => {
               setPriceRange({ min: "", max: "" });
               setSearchParams("");
@@ -169,45 +170,81 @@ const Main = () => {
         <main className="flex-1 p-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {postData.length === 0 ? (
+              {postData.rows?.length === 0 ? (
                 <p className="text-gray-500">No items found matching your criteria.</p>
               ) : (
-              postData.map((post) => {
-                const getImage = (post) => {
-                  if (post.images.length === 0) {
-                    return "https://via.placeholder.com/300";
-                  }
-                  return `http://localhost:5000/${post.images[0].imageUrl}`;
-                };
+                postData.rows?.map((post) => {
+                  
+                
+                  const getImage = (post) => {
+                    if (post.images.length === 0) {
+                      return "https://via.placeholder.com/300";
+                    }
+                    return `http://localhost:5000/${post.images[0].imageUrl}`;
+                  };
 
-                return (
-                  <div
-                    key={post.id}
-                    className="border rounded-lg shadow hover:shadow-lg transition p-3"
-                    onClick={() => navigate(`/item-detail/${post.id}`)}
-                  >
-                    <img
-                      src={getImage(post)}
-                      alt={post.name}
-                      className="w-full h-48 object-cover rounded-md" />
+                  return (
+                    <div
+                      key={post.id}
+                      className="border rounded-lg shadow hover:shadow-lg transition p-3"
+                      onClick={() => navigate(`/item-detail/${post.id}`)}
+                    >
+                      <img
+                        src={getImage(post)}
+                        alt={post.name}
+                        className="w-full h-48 object-cover rounded-md" />
 
-                    <h2 className="text-xl font-bold text-gray-800 mt-3">
-                      ₹ {post.price}
-                    </h2>
+                      <h2 className="text-xl font-bold text-gray-800 mt-3">
+                        ₹ {post.price}
+                      </h2>
 
-                    <p className="text-gray-600 font-medium">{post.name}</p>
-                    <p className="text-gray-500">{post.location}</p>
+                      <p className="text-gray-600 font-medium">{post.name}</p>
+                      <p className="text-gray-500">{post.location}</p>
 
-                    <p className="text-xs text-gray-400 mt-2">
-                      Posted on: {new Date(post.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                );
-              })
-)}
+                      <p className="text-xs text-gray-400 mt-2">
+                        Posted on: {new Date(post.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
+
+          <Pagination
+            count={Math.ceil(postData.count / limit)}
+            page={page}
+            color="secondary"
+            shape="rounded"
+            onChange={(event, value) => {
+              setSearchParams(prev => {
+                const params = new URLSearchParams(prev);
+
+                params.set("page", value);
+                params.set("limit", limit);
+
+                return params;
+              });
+
+            }}
+            sx={{
+              "& .MuiPaginationItem-root": {
+                color: "#374151",
+              },
+
+              "& .Mui-selected": {
+                backgroundColor: "#eab308 !important",
+                color: "white",
+              },
+
+              "& .Mui-selected:hover": {
+                backgroundColor: "#ca8a04 !important",
+              },
+            }}
+          />
+
         </main>
+
       </section>
     </>
   );

@@ -22,6 +22,8 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log(formData );
+      
       const response = await api.post("/login", formData);
 
       const { token, user } = response.data;

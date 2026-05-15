@@ -76,13 +76,13 @@ const Header = () => {
                 />
 
                 {/* Location Dropdown */}
-                <select className="p-2 w-48 rounded-md border bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-yellow-500">
+                {/* <select className="p-2 w-48 rounded-md border bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-yellow-500">
                     <option value="">Choose Location</option>
                     <option value="Chandigarh">Chandigarh</option>
                     <option value="Mohali">Mohali</option>
                     <option value="Delhi">Delhi</option>
                     <option value="Rajasthan">Rajasthan</option>
-                </select>
+                </select> */}
 
                 {/* Search */}
                 <div className="flex items-center">
