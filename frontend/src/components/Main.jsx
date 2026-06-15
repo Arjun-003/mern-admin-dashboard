@@ -22,7 +22,7 @@ const Main = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await api.get(`/productImages?${searchParams.toString()}`);
+        const response = await api.get(`/products?${searchParams.toString()}`);
         setPostData(response.data);
       } catch (error) {
         console.error("Error fetching posts:", error);

@@ -13,6 +13,7 @@ import comments from './routes/AppRoutes/commentsRoutes.js';
 import producting from "./routes/AppRoutes/productImgRoute.js";
 import likeProductRoute from "./routes/AppRoutes/likeProductRoute.js";
 import chatData from './routes/AppRoutes/ChatRoutes.js';
+import orders from './routes/AppRoutes/ordersRoute.js'
 
 // Admin Routes
 import AdminDash from './routes/AdminRoutes/dashBoardRoutes.js';
@@ -50,6 +51,7 @@ app.use('/', SubCatRoutes);
 app.use('/', comments);
 app.use('/', chatData);
 app.use('/', likeProductRoute);
+app.use('/', orders);
 
 // Admin Routes
 app.use('/api', AdminDash);
@@ -68,7 +70,7 @@ const dbConnect = async () => {
   try {
     await sequelize.authenticate();
     console.log("Database connected.");
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({alter:false});
     console.log("Models synced.");
   } catch (error) {
     console.error("DB error:", error); 

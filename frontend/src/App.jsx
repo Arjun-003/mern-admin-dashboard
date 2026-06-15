@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
-
 import Main from "./components/Main.jsx";
 import Login from "./components/LogIn.jsx";
 import OtpSent from "./components/OtpSent.jsx";
@@ -14,9 +13,16 @@ import ProductDetail from "./components/ProductDetail.jsx";
 import ChatBox from "./components/ChatBox.jsx";
 import MainLayout from "./components/MainLayout.jsx";
 import ChatWindow from "./components/ChatWindow.jsx";
-// import Test from "./components/test.jsx";
-
 import { ProtectedRoute } from "./ProtectedRoutes.jsx";
+import Todo from "./components/todo.jsx";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import StripePage from "./components/stripe/StripePage.jsx";
+
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+
+
 function App() {
 
 
@@ -28,6 +34,15 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/verify-otp" element={<OtpSent />} />
+
+      <Route
+        path="/stripe-page/:id"
+        element={<StripePage />}
+      />
+
+      <Route path="/todo" element={<Todo />} />
+
+
       {/* Forget Password Routes */}
       <Route path="/forget-password" element={<ForgetPassword />} />
       <Route path="/enter-password" element={<EnterNewPassword />} />

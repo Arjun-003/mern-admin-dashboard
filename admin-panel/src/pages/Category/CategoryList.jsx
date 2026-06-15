@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import { Tooltip } from "react-tooltip";
 
 function CategoriesList() {
+  
   const getInitialStateFromURL = () => {
     const params = new URLSearchParams(window.location.search);
     return {

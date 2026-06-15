@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -14,6 +15,8 @@
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.2",
     "@mui/material": "^9.0.1",
+    "@stripe/react-stripe-js": "^6.6.0",
+    "@stripe/stripe-js": "^9.8.0",
     "axios": "^1.13.2",
     "dotenv": "^17.3.1",
     "pagination": "^0.4.6",
@@ -24,7 +27,9 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.9.5",
     "reactjs-popup": "^2.0.6",
+    "reactstrap": "^9.2.3",
     "socket.io-client": "^4.8.3",
+    "stripe": "^22.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

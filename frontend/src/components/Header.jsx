@@ -24,10 +24,10 @@ const Header = () => {
     useEffect(() => {
         if (user?.profile_image) {
             setImagePreview(`http://localhost:5000/${user.profile_image}`);
-            console.log(user.profile_image);
         } else {
             setImagePreview(null);
         }
+
     }, [user?.profile_image]);
 
     /* ---------------- Search Handler ---------------- */
@@ -46,22 +46,39 @@ const Header = () => {
 
     /* ---------------- Socket Setup ---------------- */
     useEffect(() => {
-        if (!user?.id) return;
 
-        socket.connect();
-        socket.emit("join", user.id);
+        if (!user?.id) return;
 
         const handleUnread = (count) => {
             setUnreadCount(count);
         };
 
-        socket.on("unreadCountUpdate", handleUnread);
+        socket.on("unreadcounts", handleUnread);
+
+        // initial load
+        socket.emit("unreadCountUpdate");
 
         return () => {
-            socket.off("unreadCountUpdate", handleUnread);
-            socket.disconnect();
+            socket.off("unreadcounts", handleUnread);
         };
+
     }, [user?.id]);
+    useEffect(() => {
+
+        const handleRefreshUnread = (data) => {
+            console.log(data);
+
+            setUnreadCount(data)
+            socket.emit("unreadCountUpdate");
+        };
+
+        socket.on("refreshUnread", handleRefreshUnread);
+
+        return () => {
+            socket.off("refreshUnread", handleRefreshUnread);
+        };
+
+    }, []);
 
     return (
         <>

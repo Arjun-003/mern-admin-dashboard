@@ -1,54 +1,227 @@
 import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
 import Chat from "../models/chats.js";
 import Messages from "../models/messages.js";
 import { Op } from "sequelize";
+import dotenv from "dotenv";
+import Product from "../models/product.js";
+import Users from "../models/users.js";
+import ProductImage from "../models/productImage.js";
+dotenv.config();
 
 let io;
+
 const initSocket = (server) => {
 
+  // 1️⃣ Create socket server FIRST
   io = new Server(server, {
     cors: {
-      origin: (origin, callback) => {
-        const allowedOrigins = [
-          "http://localhost:5173", //Web site 
-          "http://localhost:5174" // Admin panel
-        ];
+      origin: [
+        "http://localhost:5173",
+        "http://localhost:5174"
+      ],
+      credentials: true,
+    },
+  });
 
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
-      credentials: true
+  // 2️⃣ Socket Authentication Middleware
+  io.use((socket, next) => {
+    try {
+
+      const token = socket.handshake.auth.token;
+
+      if (!token) {
+        return next(new Error("No token provided"));
+      }
+
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET
+      );
+
+      // attach user to socket
+      socket.userId = decoded.id;
+
+      next();
+
+    } catch (err) {
+      console.log("Socket auth error:", err.message);
+
+      next(new Error("Unauthorized"));
     }
   });
 
+  // 3️⃣ Connection
   io.on("connection", (socket) => {
 
     console.log("Socket connected:", socket.id);
+    // user room
+    socket.join(`user:${socket.userId}`);
+    console.log(`User ${socket.userId} joined`);
 
-    // USER JOIN
-    socket.on("join", (userId) => {
+    // Checking the read Count
+    socket.on("unreadCountUpdate", async () => {
+      try {
 
-      if (!userId) return;
+        const userId = socket.userId;
 
-      socket.userId = userId;
+        const chats = await Chat.findAll({
+          where: {
+            [Op.or]: [
+              { senderId: userId },
+              { receiverId: userId }
+            ]
+          },
+          attributes: [
+            "senderId",
+            "receiverId",
+            "unreadCountForSender",
+            "unreadCountForReceiver"
+          ]
+        });
 
-      socket.join(`user:${userId}`);
-      console.log(`User ${userId} joined their room`);
+        let totalUnread = 0;
+
+        chats.forEach(chat => {
+
+          if (chat.senderId === userId) {
+
+            totalUnread += chat.unreadCountForSender;
+
+          } else {
+
+            totalUnread += chat.unreadCountForReceiver;
+
+          }
+
+        });
+
+        socket.emit("unreadcounts", totalUnread);
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
     });
+
+    // Mark As Read
+    socket.on("markAsRead", async ({ chatId }) => {
+      try {
+        const userId = socket.userId;
+
+        const chats = await Chat.findOne({
+          where: {
+            id: chatId
+          }
+        });
+
+
+        if (!chats) return;
+
+        if (chats.senderId == userId) {
+          chats.unreadCountForSender = 0;
+        } else {
+          chats.unreadCountForReceiver = 0;
+        }
+
+        await chats.save();
+
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    // Get Chats of User
+
+    socket.on("getUserChats", async () => {
+
+      try {
+
+        const userId = socket.userId;
+
+        const chats = await Chat.findAll({
+          where: {
+            [Op.or]: [
+              { senderId: userId },
+              { receiverId: userId }
+            ]
+          },
+
+          attributes: [
+            "id",
+            "senderId",
+            "receiverId",
+            "productId",
+            "updatedAt",
+            "unreadCountForSender",
+            "unreadCountForReceiver"
+          ],
+
+          include: [
+            {
+              model: Messages,
+              as: "lastMessage",
+              attributes: ["id", "message", "createdAt", "senderId"]
+            },
+            {
+              model: Product,
+              as: "product",
+              attributes: ["id", "name", "price"],
+              include: [{
+                model: ProductImage,
+                as: "images",
+                attributes: ["id", "imageUrl"],
+                limit: 1
+              }]
+            },
+            {
+              model: Users,
+              as: "sender",
+              attributes: ["id", "name", "profile_image"]
+            },
+            {
+              model: Users,
+              as: "receiver",
+              attributes: ["id", "name", "profile_image"]
+            }
+          ],
+
+          order: [["updatedAt", "DESC"]]
+        });
+        const result = chats.map(chat => {
+          const data = chat.get({ plain: true });
+          return {
+            ...data,
+            unreadCount:
+              userId === data.senderId
+                ? data.unreadCountForSender
+                : data.unreadCountForReceiver
+          };
+
+        });
+
+        socket.emit("takeChats", result);
+
+      } catch (error) {
+
+        console.error("getUserChats error:", error);
+
+        return res.status(500).json({
+          message: "Failed to fetch chats"
+        });
+
+      }
+
+    })
+
 
 
     // SEND MESSAGE
     socket.on("sendMessage", async (data) => {
 
       try {
-
         const senderId = socket.userId;
-
-        if (!senderId) return;
-
         const { receiverId, productId, message } = data;
 
         let chat = await Chat.findOne({
@@ -62,13 +235,11 @@ const initSocket = (server) => {
         });
 
         if (!chat) {
-
           chat = await Chat.create({
             senderId,
             receiverId,
             productId
           });
-
         }
 
         const newMessage = await Messages.create({
@@ -87,98 +258,33 @@ const initSocket = (server) => {
             ? "unreadCountForReceiver"
             : "unreadCountForSender"
         );
-
-        // SEND MESSAGE TO BOTH USERS
-        io.to(`user:${receiverId}`).emit("newMessage", newMessage);
-        io.to(`user:${senderId}`).emit("newMessage", newMessage);
-
-      } catch (err) {
-        console.error("sendMessage error:", err);
-      }
-    });
-
-
-    // GET MESSAGES HISTORY
-    socket.on("getMessages", async ({ receiverId, productId }) => {
-
-      try {
-
-        const senderId = socket.userId;
-
-        const chat = await Chat.findOne({
-          where: {
-            [Op.or]: [
-              { senderId, receiverId, productId },
-              { senderId: receiverId, receiverId: senderId, productId }
-            ]
-          }
-        });
-
-        if (!chat) {
-          socket.emit("messagesData", []);
-          return;
-        }
-
-        const messages = await Messages.findAll({
-          where: { chatId: chat.id },
-          order: [["createdAt", "ASC"]]
-        });
-
-        socket.emit("messagesData", messages);
-
-      } catch (err) {
-
-        console.error(err);
-
-      }
-
-    });
-
-
-    // MARK READ
-    socket.on("markAsRead", async ({ chatId }) => {
-
-      try {
-
-        const userId = socket.userId;
-
-        const chat = await Chat.findByPk(chatId);
-
-        if (!chat) return;
-
-        if (userId === chat.senderId) {
-
-          await chat.update({ unreadCountForSender: 0 });
-
-        } else {
-
-          await chat.update({ unreadCountForReceiver: 0 });
-
-        }
-
-        await Messages.update(
-          { isRead: true },
-          {
-            where: {
-              chatId,
-              receiverId: userId,
-              isRead: false
-            }
-          }
+        io.to(`user:${receiverId}`).emit(
+          "refreshUnread"
         );
 
+        io.to(`user:${receiverId}`).emit(
+          "newMessage",
+          newMessage
+        );
+
+        io.to(`user:${senderId}`).emit(
+          "newMessage",
+          newMessage
+        );
+
+
       } catch (err) {
-
-        console.error(err);
-
+        console.log("sendMessage error:", err);
       }
-
     });
-    socket.on("disconnect", () => {
 
+    // disconnect
+    socket.on("disconnect", () => {
       console.log("Socket disconnected:", socket.id);
     });
+
   });
+
   return io;
 };
 
@@ -186,6 +292,7 @@ export const getIo = () => {
   if (!io) {
     throw new Error("Socket.io not initialized");
   }
+
   return io;
 };
 

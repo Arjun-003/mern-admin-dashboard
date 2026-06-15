@@ -36,32 +36,32 @@ const ChatData = {
           {
             model: Messages,
             as: "lastMessage",
-            attributes: ["id","message","createdAt","senderId"]
+            attributes: ["id", "message", "createdAt", "senderId"]
           },
           {
             model: Product,
             as: "product",
-            attributes: ["id","name","price"],
+            attributes: ["id", "name", "price"],
             include: [{
               model: ProductImage,
               as: "images",
-              attributes: ["id","imageUrl"],
+              attributes: ["id", "imageUrl"],
               limit: 1
             }]
           },
           {
             model: User,
             as: "sender",
-            attributes: ["id","name","profile_image"]
+            attributes: ["id", "name", "profile_image"]
           },
           {
             model: User,
             as: "receiver",
-            attributes: ["id","name","profile_image"]
+            attributes: ["id", "name", "profile_image"]
           }
         ],
 
-        order: [["updatedAt","DESC"]]
+        order: [["updatedAt", "DESC"]]
       });
 
       const result = chats.map(chat => {
@@ -90,6 +90,73 @@ const ChatData = {
 
     }
 
+  },
+   getOldMessages: async (req, res) => {
+  try {
+
+    const senderId = req.user.id;
+
+    const { receiverId, productId } = req.params;
+
+    let chat = await Chat.findOne({
+      where: {
+        productId,
+        [Op.or]: [
+          { senderId, receiverId },
+          { senderId: receiverId, receiverId: senderId }
+        ]
+      }
+    });
+
+    if (!chat) {
+      return res.status(200).json([]);
+    }
+
+    const oldMessages = await Messages.findAll({
+      where: { chatId: chat.id },
+        order: [["createdAt", "ASC"]]
+    });
+
+    res.status(200).json(oldMessages);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server Error"
+    });
+  }
+},
+
+  chatDelete: async (req, res) => {
+
+    try {
+      const { id } = req.user;
+      // console.log(id,'user ID ');
+
+      const chat = await Chat.findOne({
+        where: {
+          [Op.or]: [
+            { senderId: id },
+            { receiverId: id }
+          ]
+        }
+      })
+
+      const message = await Messages.findAll({ where: { chatId: chat.id } })
+      console.log(message);
+      if (!chat && !message) return 'Nodata'
+      // await message.destroy({ where: { chatId: chat.id } })
+      await chat.destroy({ where: { userId: id } })
+      return res.status(200).json({
+        message: "Chat deleted successfully"
+      });
+
+
+    } catch (error) {
+      console.log(error);
+
+    }
   }
 
 };

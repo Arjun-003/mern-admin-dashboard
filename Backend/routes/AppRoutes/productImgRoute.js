@@ -4,7 +4,7 @@ import productData from "../../controllers/AppController/productController.js"
 import verifyToken from "../../middleware/verifyToken.js"
 const router = express.Router()
 
-router.get("/productImages", productData.getallproducts)
+router.get("/products", productData.getallproducts)
 router.get("/singleProduct/:id", productData.getSingleProduct)
 router.get("/myProducts",verifyToken, productData.myProducts)
 router.delete("/deleteProduct/:id", verifyToken, productData.deleteProduct)

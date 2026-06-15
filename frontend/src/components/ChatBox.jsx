@@ -16,17 +16,18 @@ const ChatBox = () => {
 
     if (!userId || loading || !token) return;
 
-    const fetchChats = async () => {
-
-      const res = await api.get(`/chats`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      setChats(res.data);
-
+    const handleChats = (data) => {
+    
+      setChats(data);
     };
 
-    fetchChats();
+    socket.on("takeChats", handleChats);
+
+    socket.emit("getUserChats");
+
+    return () => {
+      socket.off("takeChats", handleChats);
+    };
 
   }, [userId, loading, token]);
 
@@ -35,17 +36,33 @@ const ChatBox = () => {
 
     const handleNewMessage = (msg) => {
 
-      setChats(prev =>
-        prev.map(chat =>
-          chat.id === msg.chatId
-            ? {
-              ...chat,
-              lastMessage: msg,
-              unreadCount: (chat.unreadCount || 0) + 1
-            }
-            : chat
-        )
-      );
+      setChats(prev => {
+
+        const existingChat = prev.find(
+          chat => chat.id === msg.chatId
+        );
+
+        // chat already exists
+        if (existingChat) {
+
+          return prev.map(chat =>
+            chat.id === msg.chatId
+              ? {
+                ...chat,
+                lastMessage: msg,
+                unreadCount: (chat.unreadCount || 0) + 1
+              }
+              : chat
+          );
+
+        }
+
+        // new chat created first time
+        socket.emit("getUserChats");
+
+        return prev;
+
+      });
 
     };
 
@@ -54,6 +71,21 @@ const ChatBox = () => {
     return () => socket.off("newMessage", handleNewMessage);
 
   }, []);
+
+  const deleteChat = async (chatId) => {
+    try {
+      api.delete("/chatDelete", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setChats(prev =>
+        prev.filter(chat => chat.id !== chatId)
+      );
+    } catch (error) {
+      console.log(error);
+
+    }
+
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -85,10 +117,11 @@ const ChatBox = () => {
                   onClick={() =>
                     navigate(`/chat-window/${otherUser.id}/${chat.productId}`)
                   }
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
                 >
 
-                  <div className="relative h-10 w-10">
+                  {/* Images */}
+                  <div className="relative h-10 w-10 flex-shrink-0">
 
                     <img
                       src={productImage}
@@ -106,21 +139,39 @@ const ChatBox = () => {
 
                   </div>
 
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">
+                  {/* Chat Info */}
+                  <div className="flex-1 min-w-0">
+
+                    <p className="font-medium text-sm truncate">
                       {otherUser?.name} - {productName}
                     </p>
 
                     <p className="text-xs text-gray-500 truncate">
                       {chat.lastMessage?.message}
                     </p>
+
                   </div>
 
-                  {chat.unreadCount > 0 && (
-                    <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                      {chat.unreadCount}
-                    </div>
-                  )}
+                  {/* Right Side */}
+                  <div className="flex items-center gap-2">
+
+                    {chat.unreadCount > 0 && (
+                      <div className="bg-red-500 text-white text-xs min-w-[22px] h-[22px] flex items-center justify-center rounded-full px-1">
+                        {chat.unreadCount}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteChat(chat.id);
+                      }}
+                      className="text-xs bg-red-100 text-red-600 px-3 py-1 rounded-md hover:bg-red-200 transition"
+                    >
+                      Delete
+                    </button>
+
+                  </div>
 
                 </div>
 

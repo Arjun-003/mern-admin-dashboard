@@ -7,7 +7,11 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth(); // Get login function from AuthContext
 
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({
+     email: "",
+     password: "" 
+    });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,9 +24,8 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
-      console.log(formData );
+      console.log(formData);
       
       const response = await api.post("/login", formData);
 

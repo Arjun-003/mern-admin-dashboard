@@ -33,7 +33,7 @@ SubCategory.belongsTo(Category, { foreignKey: "categoryId" });
 Users.hasMany(Product, { foreignKey: "sellerId", as: "userProducts" });
 Product.belongsTo(Users, { foreignKey: "sellerId", as: "productUser" });
 
-SubCategory.hasMany(Product, { foreignKey: "SubCategoryId" , as: "subCategoryProducts"});
+SubCategory.hasMany(Product, { foreignKey: "SubCategoryId", as: "subCategoryProducts" });
 Product.belongsTo(SubCategory, { foreignKey: "SubCategoryId", as: "productSubCategory" });
 
 Category.hasMany(Product, { foreignKey: "categoryId", as: "categoryProducts" });
@@ -56,29 +56,29 @@ Users.hasMany(Like, { foreignKey: "userId", as: "userLikes" });
 /* ========= CHAT SYSTEM ========= */
 
 // User → Chat
-Users.hasMany(Chat, { foreignKey: "senderId", as: "sentChats" });
-Users.hasMany(Chat, { foreignKey: "receiverId", as: "receivedChats" });
+Users.hasMany(Chat, { foreignKey: "senderId", as: "sentChats", onDelete: 'CASCADE' });
+Users.hasMany(Chat, { foreignKey: "receiverId", as: "receivedChats", onDelete: 'CASCADE' });
 
 // Chat → User
-Chat.belongsTo(Users, { foreignKey: "senderId", as: "sender" });
-Chat.belongsTo(Users, { foreignKey: "receiverId", as: "receiver" });
+Chat.belongsTo(Users, { foreignKey: "senderId", as: "sender", onDelete: 'CASCADE' });
+Chat.belongsTo(Users, { foreignKey: "receiverId", as: "receiver", onDelete: 'CASCADE' });
 
 // Chat → Messages
-Chat.hasMany(Messages, { foreignKey: "chatId", as: "messages" });
-Messages.belongsTo(Chat, { foreignKey: "chatId" , as: "chat"});
+Chat.hasMany(Messages, { foreignKey: "chatId", as: "messages" , onDelete: 'CASCADE'});
+Messages.belongsTo(Chat, { foreignKey: "chatId", as: "chat" , onDelete: 'CASCADE'});
 
-Chat.belongsTo(Messages, {foreignKey: "lastMessageId", as: "lastMessage"});
+Chat.belongsTo(Messages, { foreignKey: "lastMessageId", as: "lastMessage", onDelete: 'CASCADE' });
 
 // User → Messages
-Users.hasMany(Messages, { foreignKey: "senderId", as: "sentMessages" });
-Messages.belongsTo(Users, { foreignKey: "senderId", as: "sender" });
+Users.hasMany(Messages, { foreignKey: "senderId", as: "sentMessages" , onDelete: 'CASCADE' });
+Messages.belongsTo(Users, { foreignKey: "senderId", as: "sender", onDelete: 'CASCADE' });
 
-Users.hasMany(Messages, { foreignKey: "receiverId", as: "receivedMessages" });
-Messages.belongsTo(Users, { foreignKey: "receiverId", as: "receiver" }); 
+Users.hasMany(Messages, { foreignKey: "receiverId", as: "receivedMessages", onDelete: 'CASCADE' });
+Messages.belongsTo(Users, { foreignKey: "receiverId", as: "receiver" , onDelete: 'CASCADE'});
 
 // Chat → Product
-Product.hasMany(Chat, { foreignKey: "productId", as: "chats" });
-Chat.belongsTo(Product, { foreignKey: "productId", as: "product" });
+Product.hasMany(Chat, { foreignKey: "productId", as: "chats", onDelete: 'CASCADE' });
+Chat.belongsTo(Product, { foreignKey: "productId", as: "product" , onDelete: 'CASCADE'});
 
 // Export all models
-export default { Users, Category, SubCategory, Messages, Chat, Product, ProductImage, Comments , Like };
+export default { Users, Category, SubCategory, Messages, Chat, Product, ProductImage, Comments, Like };

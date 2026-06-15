@@ -12,16 +12,16 @@ import path from "path";
 dotenv.config();
 // Created a Object to hold all user-related controller functions
 const usersdata = {
-getAllUsers: async (req, res) => {
-  try {
-    const allUsers = await users.findAll();
-    res.status(200).json({ allUsers });
+    getAllUsers: async (req, res) => {
+        try {
+            const allUsers = await users.findAll();
+            res.status(200).json({ allUsers });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to fetch all users data" });
-  }
-},
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Failed to fetch all users data" });
+        }
+    },
     singleUser: async (req, res) => {
         const { id } = req.params;
         try {
@@ -159,8 +159,8 @@ getAllUsers: async (req, res) => {
     login: async (req, res) => {
         try {
             const { email, password } = req.body;
-            console.log(email,password);
-            
+            console.log(email, password);
+
             const user = await users.findOne({ where: { email } });
             if (!user) {
                 return res.status(401).json({ error: 'User Not Found !' });
@@ -284,6 +284,6 @@ getAllUsers: async (req, res) => {
 
 }
 
-export default usersdata ;
+export default usersdata;
 
 

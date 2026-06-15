@@ -25,7 +25,7 @@ export const CatProvider = ({ children }) => {
                 setSubCategories(subRes.data);
                
                 // 3️⃣ Save to localStorage (optional)
-                const product = await api.get("/productImages")
+                const product = await api.get("/products")
                 setProduct(product.data)
             } catch (error) {
                 console.error("Category Context Error:", error);

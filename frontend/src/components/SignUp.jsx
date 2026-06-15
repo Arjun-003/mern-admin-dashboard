@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 
 const schema = z.object({
-  name: z.string().min(3, "Minimum 3 characters"),
+  name: z.string().min(3, "Minimum 3 characters").max(40),
 
   email: z.string().email("Invalid email"),
 
@@ -30,7 +30,14 @@ const schema = z.object({
 function SignUp() {
   const navigate = useNavigate();
 
-  const {register,handleSubmit,formState:{ errors }} = useForm({resolver: zodResolver(schema),mode:"onChange",});
+  const {
+    register,
+    handleSubmit,
+    formState:{ errors }} = useForm(
+      {resolver: zodResolver(schema)
+        ,mode:"onChange",});
+    console.log(formState,"data of Form");
+    
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

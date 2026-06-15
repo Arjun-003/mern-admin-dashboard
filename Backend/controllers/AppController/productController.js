@@ -210,6 +210,7 @@ const productData = {
             await Like.destroy({
                 where: { productId: id }
             });
+            
             await ProductImage.destroy({ where: { productId: id } });
             await Product.destroy({ where: { id } });
 
@@ -254,7 +255,7 @@ const productData = {
 
             // ⭐ CHECK IF CURRENT USER LIKED
             const isLiked = product.likes.some(
-                like => like.userId === userId
+                like => like.userId === id
             );
 
             res.status(200).json({
