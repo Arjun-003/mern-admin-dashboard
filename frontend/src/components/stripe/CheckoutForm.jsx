@@ -14,23 +14,25 @@ const CheckoutForm = () => {
   const elements = useElements();
 
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false)
   const { id } = useParams()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!stripe || !elements) return;
-
+    setProcessing(true);
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: "http://localhost:5173/payment-success",
       },
     });
-
+    
     if (error) {
       console.error(error.message);
+      setProcessing(false)
     }
   };
 
@@ -59,6 +61,7 @@ const CheckoutForm = () => {
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
@@ -143,10 +146,10 @@ const CheckoutForm = () => {
 
               <button
                 type="submit"
-                disabled={!stripe}
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!stripe || processing}
+                className="border border-dashed border-green-200 rounded-xl p-2 bg-green-400"
               >
-                Pay ₹{(Number(product.price) + 40).toFixed(2)}
+                {processing ? "Processing..." : `Pay ₹${(Number(product.price) + 40).toFixed(2)}`}
               </button>
             </form>
           </div>

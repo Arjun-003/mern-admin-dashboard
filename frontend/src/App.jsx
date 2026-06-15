@@ -14,10 +14,10 @@ import ChatBox from "./components/ChatBox.jsx";
 import MainLayout from "./components/MainLayout.jsx";
 import ChatWindow from "./components/ChatWindow.jsx";
 import { ProtectedRoute } from "./ProtectedRoutes.jsx";
-import Todo from "./components/todo.jsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import StripePage from "./components/stripe/StripePage.jsx";
+import PaymentSuccess from "./components/stripe/PaymentSuccess.jsx";
 
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
@@ -34,13 +34,11 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/verify-otp" element={<OtpSent />} />
-
+      <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route
         path="/stripe-page/:id"
         element={<StripePage />}
       />
-
-      <Route path="/todo" element={<Todo />} />
 
 
       {/* Forget Password Routes */}
