@@ -5,6 +5,10 @@ import users from "../../models/users.js";
 import fs from 'fs'
 import path from 'path'
 import Like from "../../models/likeProduct.js";
+import dotenv from 'dotenv'
+import Stripe from "stripe";
+dotenv.config()
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 
 const productData = {
@@ -156,12 +160,31 @@ const productData = {
             }));
             await ProductImage.bulkCreate(imageRecords);
 
+            let accountLink = null;
+
+            if (!user.stripeAccountId) {
+                const account = await stripe.accounts.create({
+                    type: "express",
+                });
+
+                user.stripeAccountId = account.id;
+
+                accountLink = await stripe.accountLinks.create({
+                    account: account.id,
+                    refresh_url: "http://localhost:5173/seller/refresh",
+                    return_url: "http://localhost:5173/seller/success",
+                    type: "account_onboarding",
+                });
+            }
             user.role = "seller";
             await user.save();
+            console.log(accountLink,"data of account link");
+            
             res.status(201).json({
                 message: "Product created successfully",
                 product: newProduct,
                 images: imageRecords,
+                onboardingUrl: accountLink?.url || null
             });
 
         } catch (error) {
@@ -210,7 +233,7 @@ const productData = {
             await Like.destroy({
                 where: { productId: id }
             });
-            
+
             await ProductImage.destroy({ where: { productId: id } });
             await Product.destroy({ where: { id } });
 

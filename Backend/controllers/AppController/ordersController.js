@@ -25,6 +25,7 @@ const ordersController = {
                         { productId: productId }
                     ]
                 }
+
             })
 
             if (order) {
@@ -40,7 +41,6 @@ const ordersController = {
         } catch (error) {
             console.log(error);
         }
-
     },
 
     orderCreateIntent: async (req, res) => {

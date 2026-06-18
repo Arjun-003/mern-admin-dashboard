@@ -12,6 +12,8 @@ const CheckoutForm = () => {
   const { token } = useAuth()
   const stripe = useStripe();
   const elements = useElements();
+  console.log(elements,'elements here');
+  
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,17 +24,19 @@ const CheckoutForm = () => {
     e.preventDefault();
 
     if (!stripe || !elements) return;
+
     setProcessing(true);
+
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: "http://localhost:5173/payment-success",
       },
     });
-    
+
     if (error) {
-      console.error(error.message);
-      setProcessing(false)
+      alert(error.message);
+      setProcessing(false);
     }
   };
 

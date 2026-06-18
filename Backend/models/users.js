@@ -13,7 +13,7 @@ const Users = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    age:{
+    age: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -49,12 +49,16 @@ const Users = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
-    
+    stripeAccountId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
   },
   {
     timestamps: true
   }
-  
+
 );
 
 export default Users;

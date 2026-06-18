@@ -59,16 +59,21 @@ const PostItemDetail = () => {
             imageFiles.forEach((file) => {
                 fd.append("imageUrl", file);
             });
-            console.log(fd, "Here is the Fd data hey ");
+           
             const response = await api.post("/createProduct", fd, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data",
                 },
             });
+            console.log(response.data,'here s the data');
+            
+            // if (res.data.onboardingUrl) {
+            //     window.location.href = res.data.onboardingUrl;
+            // }
             alert("Product Posted")
             navigate("/")
-            console.log("Product posted:", response.data);
+           
         } catch (error) {
             console.error("Error posting product:", error);
         }
@@ -94,19 +99,19 @@ const PostItemDetail = () => {
                         multiple
                         className="hidden"
                         onChange={(e) => {
+
+                            const selectedFiles = Array.from(e.target.files);
                             
-                            const selectedFiles = Array.from(e.target.files);                         
-                            console.log(selectedFiles);
                             setImageFiles((prevFiles) => {
-                               
-                    
+
+
                                 const combinedFiles = [...prevFiles, ...selectedFiles].slice(0, 10);
                                 return combinedFiles;
                             });
 
                             setImages((prevImages) => {
-                               
-                                
+
+
                                 const newUrls = selectedFiles.map((file) =>
                                     URL.createObjectURL(file)
                                 );

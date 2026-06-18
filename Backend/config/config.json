@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "arjundb",
+    "database": "oldgoldspare",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "arjundb",
+    "database": "oldgoldspare",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "arjundb",
+    "database": "oldgoldspare",
+    "host": "localhost",
+    "dialect": "mysql"
+  }
+}

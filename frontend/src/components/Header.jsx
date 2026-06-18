@@ -82,7 +82,7 @@ const Header = () => {
 
     return (
         <>
-            <header className="fixed top-0 left-0 w-full z-50 bg-[#111D13] flex items-center justify-evenly h-24 shadow-md">
+            <header className=" fixed top-0 left-0 w-full z-50 bg-[#111D13] flex flex-wrap items-center  justify-between px-4 md:px-8 py-3 shadow-md">
 
                 {/* Logo */}
                 <img
@@ -102,14 +102,18 @@ const Header = () => {
                 </select> */}
 
                 {/* Search */}
-                <div className="flex items-center">
+                <div className="flex items-center w-full md:w-auto mt-2 md:mt-0">
                     <input
                         type="text"
                         name="search"
                         value={formData.search}
                         onChange={handleChange}
                         placeholder="Search items here..."
-                        className="rounded-md w-80 h-10 px-4 shadow-sm focus:ring-2 focus:ring-yellow-500"
+                        className="flex-1
+      md:w-80
+      h-10
+      px-4
+      rounded-md"
                     />
                     <button
                         onClick={handleSubmit}
@@ -135,7 +139,7 @@ const Header = () => {
                         <div className="flex items-center gap-3 cursor-pointer">
 
                             {/* Avatar */}
-                            <div className="w-10 h-10 rounded-full overflow-hidden border border-white/30 flex items-center justify-center bg-yellow-500 text-white font-semibold">
+                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden border border-white/30 flex items-center justify-center bg-yellow-500 text-white font-semibold">
                                 {imagepreview && !imageError ? (
                                     <img
                                         src={imagepreview}
@@ -151,14 +155,14 @@ const Header = () => {
                             </div>
 
                             {/* Username */}
-                            <span className="text-white font-medium">
+                            <span className="hidden md:block text-white font-medium">
                                 {user?.name || "User"}
                             </span>
 
                         </div>
                         {/* Dropdown */}
                         <div className="absolute right-0 mt-0 w-40 bg-white text-gray-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition">
-                            <ul className="py-2">
+                            <ul className="flex gap-4 overflow-x-auto whitespace-nowrap px-4">
                                 <li
                                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                     onClick={() => navigate("/profile")}
@@ -205,7 +209,11 @@ const Header = () => {
                         }
                         navigate("/post-categories");
                     }}
-                    className="px-5 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition"
+                    className="px-3 md:px-5
+py-2
+text-sm md:text-base
+bg-yellow-500
+rounded-md"
                 >
                     Sell Item
                 </button>

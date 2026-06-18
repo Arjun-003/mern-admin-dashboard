@@ -35,7 +35,6 @@ const Main = () => {
 
   return (
     <>
-
       {/* Main Content */}
       <section className="flex bg-gray-100 mt-36 pt-4">
         {/* Left Sidebar */}
